@@ -1,46 +1,106 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import multer from 'multer';
-
-//File Path Stuff
 import path from 'path';
-import { fileURLToPath} from 'url';
+import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+
+// File Path Configuration for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Express App Initialization
+const app = express();
+const urlEncodeParser = bodyParser.urlencoded({ extended: false });
 
- var app = express();
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
 
-// Storage objects. tells multer where to put the file and what name to give it
- var storage = multer.diskStorage({
+// Multer Storage Configuration
+// Tells Multer where to store the file and how to name it
+const storage = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, 'uploads/');
     },
     filename: (req, file, callback) => {
         callback(null, file.originalname);
     }
- });
+});
 
- var upload = multer ({storage: storage}).single('file');
+// Multer Middleware for file and text data
+// The 'fields' middleware expects an array of field names from the form
+const upload = multer({ storage: storage }).fields([
+    { name: 'file', maxCount: 1 },
+    { name: 'username', maxCount: 1 } // Adding the text field name
+]);
 
-// Open form on index (/)
- app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, + 'uploadForm.html'));
- });
+// --- Page Routes ---
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages/home.html'));
+});
 
- app.post('/upload', (res, req) => {
+app.get('/studentForm', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages/studentForm.html'));
+});
+
+app.get('/adminForm', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages/adminForm.html'));
+});
+
+// --- API Routes ---
+
+// Student Form (GET)
+app.get('/getstudentForm', (req, res) => {
+    const response = {
+        firstName: req.query.firstName,
+        lastName: req.query.lastName,
+        studentId: req.query.studentId,
+        section: req.query.section
+    };
+    console.log("Response is: ", response);
+    res.end(`Received Data: ${JSON.stringify(response)}`);
+});
+
+// Admin Form (GET)
+app.get('/getadminForm', (req, res) => {
+    const response = {
+        firstName: req.query.firstName,
+        lastName: req.query.lastName,
+        adminId: req.query.adminId,
+        department: req.query.department
+    };
+    console.log("Response is: ", response);
+    res.end(`Received Data: ${JSON.stringify(response)}`);
+});
+
+// Admin Form Submission (POST)
+app.post('/postAdmin', upload, (req, res) => {
     upload(req, res, (err) => {
-        //Check if successful
-        if(err) return res.end('Error uploading file');
-        else {
-            //console.log(req.file);
-            res.end('File uploaded sudccessfully');
-        }
-    });
- });
+        if(err) return res.status(400).send('Error uploading file');
 
- var server = app.getlisten(5000, () => {
+        // Access the text field
+        const username = req.body.username;
+
+        // Access the uploaded file
+        const uploadedFile = req.files['file'][0];
+
+        var response = {
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            adminId: req.body.adminId,
+            department: req.body.department,
+            username: req.body.username,
+            filePath: uploadedFile.path
+        };
+
+        console.log("Response is: ", response);
+        res.end('File and form data uploaded sudccessfully');
+    });
+});
+
+// Start the server
+const server = app.listen(5000, () => {
     const host = server.address().address;
     const port = server.address().port;
-    console.log("Server running at http://%s:%s/", host, port);
- });
+    console.log(`Server running at http://${host}:${port}`);
+});

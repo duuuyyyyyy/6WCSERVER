@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combined Forms</title>
+    <style>
+        body {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5d0d0, #c47c7c);
+            display: flex;
+            flex-direction: column; /* Use column layout for multiple forms */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 20px; /* Add space between the two forms */
+            max-width: 500px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            color: #aa3d3d;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        input, select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        
+        input[type="submit"] {
+            background-color: #aa3d3d;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: auto; /* Adjust submit button width */
+            margin-top: 10px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #8a2b2b;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #aa3d3d;
+            box-shadow: 0 0 5px rgba(170, 61, 61, 0.5);
+        }
+
+        button {
+            background-color: #aa3d3d;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #8a2b2b;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-group > div {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>STUDENT</h2>
+        <form action="/getstudentForm" method="GET">
+            <div class="form-group">
+                <div>
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" name="firstName">
+                </div>
+                <div>
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName">
+                </div>
+            </div>
+            <label for="studentId">Student ID:</label>
+            <input type="text" id="studentId" name="studentId">
+            <label for="section">Section:</label>
+            <input type="text" id="section" name="section">
+            <button type="submit">SUBMIT</button>
+        </form>
+    </div>
+
+    <div class="form-container">
+        <h2>FILE UPLOAD</h2>
+        <form action="/upload" enctype="multipart/form-data" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username">
+            <label for="file">Select File:</label>
+            <input type="file" id="file" name="file">
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+</body>
+</html>

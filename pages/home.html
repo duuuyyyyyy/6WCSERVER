@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5d0d0, #c47c7c);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+        h1 {
+            color: #303030;
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.6);
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        }
+        button {
+            background-color: #303030;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+          .btn-container {
+        display: flex;
+        gap: 1.5rem;
+    }
+        button:hover {
+            background-color: #4a4a4a;
+        }
+    </style>
+</head>
+<body>
+    <h1>HOMEPAGE</h1>
+    <div class="buttons">
+        <button onclick="location.href='studentForm'">Student</button>
+        <button onclick="location.href='adminForm'">Admin</button>
+    </div>
+</body>
+</html>
