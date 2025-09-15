@@ -12,30 +12,33 @@ const __dirname = dirname(__filename);
 
 // Express and Cors App Initialization
 const app = express();
-const urlEncodeParser = bodyParser.urlencoded({ extended: false });
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors())
+
+
+// --- Temporary In-Memory Storage ---
+// This will store data only as long as the server is running.
+const studentDatabase = [];
+const uploadedFilesLog = [];
 
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
 // Multer Storage Configuration
-// Tells Multer where to store the file and how to name it
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, 'uploads/');
+        callback(null, 'upload/');
     },
     filename: (req, file, callback) => {
         callback(null, file.originalname);
     }
 });
 
-// Multer Middleware for file and text data
-// The 'fields' middleware expects an array of field names from the form
 const upload = multer({ storage: storage }).fields([
     { name: 'file', maxCount: 1 },
-    { name: 'username', maxCount: 1 } // Adding the text field name
+    { name: 'username', maxCount: 1 }
 ]);
 
 // --- Page Routes ---
@@ -61,8 +64,15 @@ app.get('/getstudentForm', (req, res) => {
         studentId: req.query.studentId,
         section: req.query.section
     };
-    console.log("Response is: ", response);
-    res.end(`Received Data: ${JSON.stringify(response)}`);
+    
+    // Store the student data in the in-memory array
+    studentDatabase.push(response);
+    
+    console.log("Received Student Data: ", response);
+    console.log("Current Student Database: ", studentDatabase);
+
+    // Send a JSON response for the front-end
+    res.json(response);
 });
 
 // Admin Form (GET)
@@ -73,33 +83,28 @@ app.get('/getadminForm', (req, res) => {
         adminId: req.query.adminId,
         department: req.query.department
     };
-    console.log("Response is: ", response);
+    console.log("Received Admin Data: ", response);
     res.end(`Received Data: ${JSON.stringify(response)}`);
 });
 
 // Admin Form Submission (POST)
 app.post('/postAdmin', upload, (req, res) => {
-    upload(req, res, (err) => {
-        if(err) return res.status(400).send('Error uploading file');
+    const username = req.body.username;
+    const uploadedFile = req.files['file'][0];
 
-        // Access the text field
-        const username = req.body.username;
+    const response = {
+        username: username,
+        filePath: uploadedFile.path
+    };
 
-        // Access the uploaded file
-        const uploadedFile = req.files['file'][0];
-
-        var response = {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            adminId: req.body.adminId,
-            department: req.body.department,
-            username: req.body.username,
-            filePath: uploadedFile.path
-        };
-
-        console.log("Response is: ", response);
-        res.end('File and form data uploaded sudccessfully');
-    });
+    // Store the file upload log in the in-memory array
+    uploadedFilesLog.push(response);
+    
+    console.log("Received File Upload: ", response);
+    console.log("Current Uploaded Files Log: ", uploadedFilesLog);
+    
+    // Send a JSON response for the front-end
+    res.json({ message: 'File and form data uploaded successfully', data: response });
 });
 
 // Start the server

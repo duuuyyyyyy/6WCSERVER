@@ -41,6 +41,19 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+body {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background: linear-gradient(135deg, #f5d0d0, #c47c7c);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    gap: 20px;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
