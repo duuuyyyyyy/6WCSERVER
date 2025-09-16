@@ -5,6 +5,7 @@ import path from 'path';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { v4 as uuidv4 } from 'uuid'; // A library for generating unique IDs
 
 // File Path Configuration for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -16,12 +17,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors())
 
-
 // --- Temporary In-Memory Storage ---
 // This will store data only as long as the server is running.
 const studentDatabase = [];
+const adminDatabase = []; // New array for admin data
 const uploadedFilesLog = [];
-
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
@@ -56,55 +56,126 @@ app.get('/adminForm', (req, res) => {
 
 // --- API Routes ---
 
-// Student Form (GET)
-app.get('/getstudentForm', (req, res) => {
-    const response = {
-        firstName: req.query.firstName,
-        lastName: req.query.lastName,
-        studentId: req.query.studentId,
-        section: req.query.section
+// Student Form Submission (POST)
+app.post('/postStudent', upload, (req, res) => {
+    const studentData = {
+        id: uuidv4(), // Generate a unique ID for the new entry
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        studentId: req.body.studentId,
+        section: req.body.section,
+        username: req.body.username,
+        filePath: req.files && req.files['file'] ? req.files['file'][0].path : null
     };
-    
-    // Store the student data in the in-memory array
-    studentDatabase.push(response);
-    
-    console.log("Received Student Data: ", response);
+
+    studentDatabase.push(studentData);
+
+    console.log("Received Student Data: ", studentData);
     console.log("Current Student Database: ", studentDatabase);
 
     // Send a JSON response for the front-end
-    res.json(response);
+    res.json({ message: 'Student data and file uploaded successfully', data: studentData });
 });
 
-// Admin Form (GET)
-app.get('/getadminForm', (req, res) => {
-    const response = {
-        firstName: req.query.firstName,
-        lastName: req.query.lastName,
-        adminId: req.query.adminId,
-        department: req.query.department
-    };
-    console.log("Received Admin Data: ", response);
-    res.end(`Received Data: ${JSON.stringify(response)}`);
+// GET all student data
+app.get('/getstudentData', (req, res) => {
+    res.json({ message: 'Student data fetched successfully', data: studentDatabase });
+});
+
+// DELETE student data by ID
+app.delete('/deleteStudent/:id', (req, res) => {
+    const { id } = req.params;
+    const initialLength = studentDatabase.length;
+    const newDatabase = studentDatabase.filter(student => student.id !== id);
+    studentDatabase.splice(0, studentDatabase.length, ...newDatabase);
+
+    if (studentDatabase.length < initialLength) {
+        console.log(`Student with ID ${id} deleted.`);
+        res.json({ message: `Student with ID ${id} deleted successfully.` });
+    } else {
+        res.status(404).json({ message: `Student with ID ${id} not found.` });
+    }
+});
+
+// UPDATE student data by ID
+app.put('/updateStudent/:id', upload, (req, res) => {
+    const { id } = req.params;
+    const studentIndex = studentDatabase.findIndex(student => student.id === id);
+
+    if (studentIndex !== -1) {
+        studentDatabase[studentIndex] = {
+            ...studentDatabase[studentIndex],
+            ...req.body,
+            filePath: req.files && req.files['file'] ? req.files['file'][0].path : studentDatabase[studentIndex].filePath
+        };
+        console.log(`Student with ID ${id} updated.`);
+        res.json({ message: `Student with ID ${id} updated successfully`, data: studentDatabase[studentIndex] });
+    } else {
+        res.status(404).json({ message: `Student with ID ${id} not found.` });
+    }
 });
 
 // Admin Form Submission (POST)
 app.post('/postAdmin', upload, (req, res) => {
-    const username = req.body.username;
-    const uploadedFile = req.files['file'][0];
-
-    const response = {
-        username: username,
-        filePath: uploadedFile.path
+    const adminData = {
+        id: uuidv4(), // Generate a unique ID for the new entry
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        adminId: req.body.adminId,
+        department: req.body.department,
+        username: req.body.username,
+        filePath: req.files && req.files['file'] ? req.files['file'][0].path : null
     };
 
-    // Store the file upload log in the in-memory array
-    uploadedFilesLog.push(response);
-    
-    console.log("Received File Upload: ", response);
-    console.log("Current Uploaded Files Log: ", uploadedFilesLog);
-    
-    // Send a JSON response for the front-end
-    res.json({ message: 'File and form data uploaded successfully', data: response });
+    adminDatabase.push(adminData);
+    uploadedFilesLog.push({
+        username: adminData.username,
+        filePath: adminData.filePath
+    });
+
+    console.log("Received Admin Data: ", adminData);
+    console.log("Current Admin Database: ", adminDatabase);
+
+    res.json({ message: 'Admin data and file uploaded successfully', data: adminData });
+});
+
+// GET all admin data
+app.get('/getadminData', (req, res) => {
+    res.json({ message: 'Admin data fetched successfully', data: adminDatabase });
+});
+
+// DELETE admin data by ID
+app.delete('/deleteAdmin/:id', (req, res) => {
+    const { id } = req.params;
+    const initialLength = adminDatabase.length;
+    const newDatabase = adminDatabase.filter(admin => admin.id !== id);
+    adminDatabase.splice(0, adminDatabase.length, ...newDatabase); // Efficiently replace the array content
+
+    if (adminDatabase.length < initialLength) {
+        console.log(`Admin with ID ${id} deleted.`);
+        res.json({ message: `Admin with ID ${id} deleted successfully.` });
+    } else {
+        res.status(404).json({ message: `Admin with ID ${id} not found.` });
+    }
+});
+
+// UPDATE admin data by ID
+app.put('/updateAdmin/:id', upload, (req, res) => {
+    const { id } = req.params;
+    const adminIndex = adminDatabase.findIndex(admin => admin.id === id);
+
+    if (adminIndex !== -1) {
+        // Update the existing data with new values from the request body
+        adminDatabase[adminIndex] = {
+            ...adminDatabase[adminIndex], // Keep existing data
+            ...req.body, // Overwrite with new data
+            filePath: req.files && req.files['file'] ? req.files['file'][0].path : adminDatabase[adminIndex].filePath // Update file path if a new file is uploaded
+        };
+        console.log(`Admin with ID ${id} updated.`);
+        res.json({ message: `Admin with ID ${id} updated successfully`, data: adminDatabase[adminIndex] });
+    } else {
+        res.status(404).json({ message: `Admin with ID ${id} not found.` });
+    }
 });
 
 // Start the server

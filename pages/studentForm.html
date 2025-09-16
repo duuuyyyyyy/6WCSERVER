@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Combined Forms</title>
+    <title>Student Form</title>
     <style>
         body {
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -114,7 +114,7 @@
 <body>
     <div class="form-container">
         <h2>STUDENT</h2>
-        <form action="/getstudentForm" method="GET">
+        <form action="/postStudent" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <div>
                     <label for="firstName">First Name:</label>
@@ -129,18 +129,11 @@
             <input type="text" id="studentId" name="studentId">
             <label for="section">Section:</label>
             <input type="text" id="section" name="section">
-            <button type="submit">SUBMIT</button>
-        </form>
-    </div>
-
-    <div class="form-container">
-        <h2>FILE UPLOAD</h2>
-        <form action="/upload" enctype="multipart/form-data" method="post">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username">
             <label for="file">Select File:</label>
             <input type="file" id="file" name="file">
-            <input type="submit" value="Upload">
+            <input type="submit" value="Submit & Upload">
         </form>
     </div>
 </body>

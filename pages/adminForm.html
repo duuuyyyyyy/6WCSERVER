@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Combined Forms</title>
+    <title>Admin Form</title>
     <style>
         body {
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -24,6 +24,7 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             text-align: center;
             margin-bottom: 20px;
+            max-width: 500px; /* Adjusted to match the student form's width */
             width: 100%;
             box-sizing: border-box;
         }
@@ -47,7 +48,7 @@
         }
 
         input, select {
-            width: calc(100% - 20px);
+            width: calc(100% - 20px); /* Adjusting for padding */
             padding: 10px;
             margin-bottom: 15px;
             border: 1px solid #ddd;
@@ -56,7 +57,7 @@
             font-size: 1em;
         }
         
-        input[type="submit"] {
+        input[type="submit"], button[type="submit"] { /* Combined styles for submit buttons */
             background-color: #aa3d3d;
             color: white;
             border: none;
@@ -69,7 +70,7 @@
             margin-top: 10px;
         }
 
-        input[type="submit"]:hover {
+        input[type="submit"]:hover, button[type="submit"]:hover {
             background-color: #8a2b2b;
         }
 
@@ -79,34 +80,38 @@
             box-shadow: 0 0 5px rgba(170, 61, 61, 0.5);
         }
 
-        button {
-            background-color: #aa3d3d;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 12px 25px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #8a2b2b;
-        }
-
+        /* Adjusted form-group for a two-column layout for first name and last name */
         .form-group {
-            display: flex;
-            gap: 20px;
+            display: flex; /* Changed to flex for two columns */
+            flex-wrap: wrap; /* Allows items to wrap if space is too small */
+            gap: 20px; /* Space between columns */
             margin-bottom: 15px;
         }
 
-        .form-group > div {
-            flex: 1;
+        /* Specific styling for the first-name/last-name group */
+        .form-group > div.name-field {
+            flex: 1; /* Each takes equal width */
+            min-width: calc(50% - 10px); /* Ensures a minimum width for wrapping */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* General styling for other direct children of form-group for vertical stacking */
+        .form-group > div:not(.name-field) {
+            width: 100%; /* Make other fields take full width */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 15px; /* Add margin between stacked fields */
         }
 
         .form-group label {
-            display: block;
             text-align: left;
+            margin-bottom: 8px;
+        }
+        .form-group input, .form-group select {
+            width: 100%; /* Inputs inside form-group take full available width */
         }
     </style>
 </head>
@@ -115,31 +120,23 @@
         <h2>ADMIN</h2>
         <form action="/postAdmin" enctype="multipart/form-data" method="POST">
             <div class="form-group">
-                <div>
+                <div class="name-field">
                     <label for="firstName">First Name:</label>
                     <input type="text" id="firstName" name="firstName">
                 </div>
-                <div>
+                <div class="name-field">
                     <label for="lastName">Last Name:</label>
                     <input type="text" id="lastName" name="lastName">
                 </div>
-                <div>
-                    <label for="adminId">Admin ID:</label>
-                    <input type="text" id="adminId" name="adminId">
-                </div>
-                <div>
-                    <label for="department">Department:</label>
-                    <input type="text" id="department" name="department">
-                </div>
-                <div>
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username">
-                </div>
-                <div>
-                    <label for="file">Select File:</label>
-                    <input type="file" id="file" name="file">
-                </div>
             </div>
+            <label for="adminId">Admin ID:</label>
+            <input type="text" id="adminId" name="adminId">
+            <label for="department">Department:</label>
+            <input type="text" id="department" name="department">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username">
+            <label for="file">Select File:</label>
+            <input type="file" id="file" name="file">
             <button type="submit">SUBMIT</button>
         </form>
     </div>
